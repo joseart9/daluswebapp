@@ -51,7 +51,7 @@ export default function SoldadorModal({ isOpen, onClose }: { isOpen: boolean; on
     }
 
     return (
-        <Modal isOpen={isOpen} placement="bottom-center" onOpenChange={onClose} scrollBehavior="inside">
+        <Modal className="pointer-events-none" aria-modal="true" role="dialog" isOpen={isOpen} placement="bottom-center" onOpenChange={onClose} scrollBehavior="inside" isDismissable={false}>
             <ModalContent>
                 <>
                     <ModalHeader className="flex flex-col gap-1">Registrar Soldador</ModalHeader>

@@ -5,7 +5,7 @@ export default function SoldadorCard({ soldador }: { soldador: Soldador }) {
     if (!soldador) return null;
 
     return (
-        <Card className="max-w-[400px]">
+        <Card className="max-w-[400px] shadow-lg">
             <CardHeader className="flex gap-3">
                 <div className="flex flex-col">
                     <p className="text-md">{soldador.primerApellido} {soldador.segundoApellido} {soldador.primerNombre} </p>

@@ -51,7 +51,7 @@ export default function SoldadorModal({ isOpen, onClose }: { isOpen: boolean; on
     }
 
     return (
-        <Modal aria-modal="true" role="dialog" isOpen={isOpen} placement="bottom-center" onOpenChange={onClose} scrollBehavior="inside" isDismissable={false}>
+        <Modal style={{ position: "fixed" }} aria-modal="true" role="dialog" isOpen={isOpen} placement="bottom-center" onOpenChange={onClose} scrollBehavior="inside" isDismissable={false}>
             <ModalContent>
                 <>
                     <ModalHeader className="flex flex-col gap-1">Registrar Soldador</ModalHeader>
@@ -61,8 +61,8 @@ export default function SoldadorModal({ isOpen, onClose }: { isOpen: boolean; on
                                 Datos Personales
                             </h1>
                             <section className="flex flex-col space-y-2">
-                                <Input style={{ fontSize: "16px" }} className="text-base" type="text" name="idSoldador" label="Identificador" size="sm" isRequired required />
-                                <Input className="text-base" type="text" name="primerNombre" label="Primer Nombre" size="sm" isRequired required />
+                                <Input style={{ fontSize: "16px" }} type="text" name="idSoldador" label="Identificador" size="sm" isRequired required />
+                                <Input type="text" name="primerNombre" label="Primer Nombre" size="sm" isRequired required />
                                 <Input type="text" name="segundoNombre" label="Segundo Nombre" size="sm" />
                                 <Input type="text" name="primerApellido" label="Apellido Paterno" size="sm" />
                                 <Input type="text" name="segundoApellido" label="Apellido Materno" size="sm" />

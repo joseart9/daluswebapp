@@ -16,7 +16,9 @@ import Soldador from "@/types/Soldador";
 
 const firestore = getFirestore(db);
 
-export async function getSoldadores(lastDocId?: string) {
+export async function getSoldadores(
+  lastDocId?: string
+): Promise<{ soldadores: Soldador[]; lastDocId: string | null }> {
   let soldadoresQuery;
 
   if (lastDocId) {
@@ -50,9 +52,44 @@ export async function getSoldadores(lastDocId?: string) {
 
   const querySnapshot = await getDocs(soldadoresQuery);
 
-  const soldadores: Soldador[] = querySnapshot.docs.map((doc) => ({
-    ...(doc.data() as Soldador),
-  }));
+  const soldadores = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      idSoldador: data.idSoldador,
+      primerNombre: data.primerNombre,
+      segundoNombre: data.segundoNombre,
+      primerApellido: data.primerApellido,
+      segundoApellido: data.segundoApellido,
+      correo: data.correo,
+      telefono: data.telefono,
+      direccion: data.direccion,
+      empresaActual: data.empresaActual,
+      credenciales: {
+        aws: data.credenciales?.aws
+          ? {
+              ...data.credenciales.aws,
+              fechaVencimiento:
+                data.credenciales.aws.fechaVencimiento?.toDate(),
+            }
+          : undefined,
+        ipc: data.credenciales?.ipc
+          ? {
+              ...data.credenciales.ipc,
+              fechaVencimiento:
+                data.credenciales.ipc.fechaVencimiento?.toDate(),
+            }
+          : undefined,
+        custom: data.credenciales?.custom
+          ? {
+              ...data.credenciales.custom,
+              fechaVencimiento:
+                data.credenciales.custom.fechaVencimiento?.toDate(),
+            }
+          : undefined,
+      },
+    } as Soldador; // Aseguramos el tipo Soldador con 'as Soldador'
+  });
 
   console.log(soldadores);
 

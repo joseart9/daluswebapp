@@ -6,7 +6,7 @@ import SoldadorCard from "@/app/components/SoldadorCard";
 import AddSoldadorButton from "@/app/components/AddSoldadorButton/AddSoldadorButton";
 import SoldadorModal from "@/app/components/SoldadorModal";
 import { Input } from "@nextui-org/input";
-import { CircularProgress } from "@nextui-org/react";
+import { Button, CircularProgress } from "@nextui-org/react";
 
 export default function Home() {
   const { soldadores, loading, hasMore, fetchNextPage } = useSoldadores();

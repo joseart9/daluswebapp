@@ -1,0 +1,49 @@
+{
+  "idSoldador": "7e76f4e8-4205-4c4c-a2ff-9fd7fea2940b",
+  "primerNombre": "Jose",
+  "segundoNombre": "Arturo",
+  "primerApellido": "Arguelles",
+  "segundoApellido": "Rios",
+  "correo": "jose.arturo99@outlook.com",
+  "telefono": {
+    "lada": "52",
+    "numero": "8117858904"
+  },
+  "direccion": {
+    "calle": "Caliza",
+    "numeroExterior": "1201",
+    "colonia": "Canterias",
+    "codigoPostal": "64989"
+  },
+  "empresaActual": "Araf Innovations",
+  "credenciales": {
+    "aws": {
+      "idSoldador": "98AS8XCC2",
+      "certificaciones": [
+        {
+          "name": "TESTAWS1",
+          "idCertificado": "23498ASNJLDAS",
+          "idEndorsement": ""
+        },
+        {
+          "name": "TESTAWS2",
+          "idCertificado": "JONASD8933A",
+          "idEndorsement": "SDADAS33"
+        }
+      ],
+      "fechaVencimiento": "2024-10-20T00:00:00.000Z",
+      "historialPago": {},
+      "active": false
+    },
+    "ipc": {
+      "certificaciones": {},
+      "fechaVencimiento": "2030-01-07T00:00:00.000Z",
+      "historialPago": {},
+      "active": false
+    },
+    "custom": {
+      "certificaciones": {},
+      "fechaVencimiento": "2027-01-07T00:00:00.000Z"
+    }
+  }
+}

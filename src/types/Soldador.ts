@@ -1,5 +1,6 @@
 import Direccion from "./Direccion";
 import Telefono from "./Telefono";
+import { Credencial } from "./Credenciales";
 
 export default interface Soldador {
   idSoldador: string;
@@ -11,4 +12,5 @@ export default interface Soldador {
   telefono?: Telefono;
   direccion?: Direccion;
   empresaActual?: string;
+  credenciales?: Credencial;
 }

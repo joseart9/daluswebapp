@@ -19,18 +19,20 @@ export default function useSoldadores() {
     // Llama a getSoldadores con el lastId recibido (si lo hay)
     const result = await getSoldadores(lastDocId || undefined);
 
-    console.log(result);
-
     if (result && result.soldadores.length > 0) {
-      const newSoldadores: Soldador[] = result.soldadores.map(
-        (soldador: Soldador) => ({
-          ...soldador,
-        })
-      );
+      const newSoldadores: Soldador[] = result.soldadores;
 
-      setSoldadores((prevSoldadores) => [...prevSoldadores, ...newSoldadores]);
+      // Filtra duplicados basados en idSoldador
+      setSoldadores((prevSoldadores) => {
+        const combined = [...prevSoldadores, ...newSoldadores];
+        return combined.filter(
+          (soldador, index, self) =>
+            index ===
+            self.findIndex((s) => s.idSoldador === soldador.idSoldador)
+        );
+      });
 
-      // Actualiza lastDocId para la siguiente página, basado en el último documento recibido
+      // Actualiza lastDocId para la siguiente página
       const newLastDocId = result.lastDocId;
       setLastDocId(newLastDocId || null);
 
@@ -47,10 +49,18 @@ export default function useSoldadores() {
     fetchSoldadores(); // Carga inicial de soldadores
   }, []);
 
+  // Resetea el estado si se necesita una nueva búsqueda inicial
+  const resetSoldadores = () => {
+    setSoldadores([]);
+    setLastDocId(null);
+    setHasMore(true);
+  };
+
   return {
     soldadores,
     loading,
     hasMore,
     fetchNextPage: fetchSoldadores,
+    resetSoldadores,
   };
 }

@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useRef, useCallback } from "react";
 import useSoldadores from "@/hooks/useSoldadores";
-import SoldadorCard from "@/app/components/SoldadorCard";
+import SoldadorCard from "@/app/components/SoldadorCard/SoldadorCard";
 import AddSoldadorButton from "@/app/components/AddSoldadorButton/AddSoldadorButton";
-import SoldadorModal from "@/app/components/SoldadorModal";
 import { Input } from "@nextui-org/input";
-import { Button, CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@nextui-org/react";
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const { soldadores, loading, hasMore, fetchNextPage } = useSoldadores();
-  const [isModalOpen, setModalOpen] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
+  const router = useRouter()
 
   const lastSoldadorElementRef = useCallback(
     (node: any) => {
@@ -36,9 +36,11 @@ export default function Home() {
     </main>
   );
 
+  console.log(soldadores);
+
   return (
-    <main className="flex flex-col space-y-1 p-2 h-full w-full">
-      <Input placeholder="Buscar" className="w-2/3" radius="full" startContent={
+    <main className="flex flex-col space-y-1 h-full w-full">
+      <Input placeholder="Buscar" className="w-2/3 px-4" radius="full" startContent={
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
@@ -63,9 +65,8 @@ export default function Home() {
       </div>}
 
       <div className="fixed bottom-4 right-4">
-        <AddSoldadorButton onClick={() => setModalOpen(true)} />
+        <AddSoldadorButton onClick={() => router.push("/new")} />
       </div>
-      <SoldadorModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </main>
   );
 }

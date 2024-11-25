@@ -1,7 +1,7 @@
-import SoldadorFormData from "@/app/components/SoldadorFormData";
+// import SoldadorFormData from "@/app/components/SoldadorFormData";
 
-export default function Test() {
-    return (
-        <SoldadorFormData />
-    )
-}
+// export default function Test() {
+//     return (
+//         <SoldadorFormData />
+//     )
+// }

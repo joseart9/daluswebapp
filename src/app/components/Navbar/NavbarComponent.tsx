@@ -1,7 +1,18 @@
 "use client";
-import { AvatarIcon, Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
-import AvatarSvg from "./AvatarSvg";
-export default function App() {
+import { Button, AvatarIcon, Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
+
+import routes from "./routes";
+import { usePathname, useRouter } from "next/navigation";
+
+export default function NavbarComponent() {
+
+    const pathname = usePathname();
+    const router = useRouter();
+
+    function handleRoute(href: string, _: any) {
+        router.push(href)
+    }
+
     return (
         <Navbar>
             <NavbarBrand>
@@ -9,21 +20,17 @@ export default function App() {
             </NavbarBrand>
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                <NavbarItem>
-                    <Link color="foreground" href="#">
-                        Features
-                    </Link>
-                </NavbarItem>
-                <NavbarItem isActive>
-                    <Link href="#" aria-current="page" color="secondary">
-                        Customers
-                    </Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link color="foreground" href="#">
-                        Integrations
-                    </Link>
-                </NavbarItem>
+                {routes.map((route) => (
+                    <NavbarItem key={route.href}>
+                        <Button disableRipple onPress={(_) => handleRoute(route.href, _)} color={`${pathname === route.href ? "primary" : "primary"}`}
+                            size="sm"
+                            className={` font-semibold ${pathname === route.href ? "text-white" : "text-secondary/70"}`}
+                            variant={`${pathname === route.href ? "solid" : "flat"}`}
+                            href={route.href}>
+                            {route.label}
+                        </Button>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
 
             <NavbarContent as="div" justify="end">

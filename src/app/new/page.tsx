@@ -3,99 +3,68 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { addSoldador } from "@/server/actions/soldador";
 import { useRouter } from 'next/navigation'
+import { v4 as uuidv4 } from 'uuid';
 import SoldadorFormData from "../components/SoldadorFormData";
 import Soldador from "@/types/Soldador";
 import { Button } from "@nextui-org/react";
+import FormSectionComponent from "../components/FormSection/FormSectionComponent";
+import FormSectionComponentMobile from "../components/FormSectionMobile";
+import { useForm } from "react-hook-form";
+import defaultValues from "@/app/components/FormSection/defaultValues";
+import alert from "@/utils/Alert";
+import useScreenSize from "@/hooks/useScreenSize";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 export default function AddNewSoldador() {
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState<Soldador>({
-        idSoldador: "",
-        primerNombre: "",
-        segundoNombre: "",
-        primerApellido: "",
-        segundoApellido: "",
-        correo: "",
-        empresaActual: "",
-        telefono: {
-            lada: "",
-            numero: "",
-        },
-        direccion: {
-            calle: "",
-            numeroExterior: "",
-            colonia: "",
-            codigoPostal: "",
-            ciudad: "",
-            estado: "",
-            pais: "",
-        },
-        credenciales: {
-            aws: {
-                idSoldador: "",
-                certificaciones: [],
-                fechaVencimiento: undefined,
-                historialPago: {
-                    archivoFactura: "",
-                    fechaPago: undefined,
-                    empleado: "",
-                },
-                active: false,
-            },
-            ipc: {
-                certificaciones: [],
-                fechaVencimiento: undefined,
-                historialPago: {
-                    archivoFactura: "",
-                    fechaPago: undefined,
-                    empleado: "",
-                },
-                active: false,
-            },
-            custom: {
-                certificaciones: [],
-                fechaVencimiento: undefined,
-                active: false,
-            }
-        }
-    });
+    const { control, handleSubmit, watch, setValue, reset } = useForm<Soldador>({ defaultValues });
+    const screenSize = useScreenSize();
 
-    async function onSave() {
+    // useEffect(() => {
+    //     reset(data);
+    // }, []);
+
+    const onSubmit = async (data: any) => {
         setLoading(true);
+
+        // Verificar y agregar `idSoldador` si no existe
+        const dataToSubmit = {
+            ...data,
+            idSoldador: data.idSoldador || uuidv4(),
+        };
+
+        console.log("Formulario enviado", dataToSubmit);
+
         try {
-            // Crear una copia de formData con el nuevo idSoldador
-            const updatedFormData = {
-                ...formData,
-                idSoldador: crypto.randomUUID(),
-            };
-
-            // Enviar la copia actualizada a la base de datos
-            const res = await addSoldador(updatedFormData);
-
-            setLoading(false);
-            router.push("/");
+            await addSoldador(dataToSubmit);
+            alert("Soldador agregado correctamente", "success");
+            reset();
         } catch (error) {
-            console.error(error);
+            console.error("Error al agregar el soldador:", error);
+            alert("Error al agregar el soldador, contacte con un administrador", "error");
+        } finally {
             setLoading(false);
         }
+    };
+
+    if (screenSize === "desktop") {
+        return (
+            <main className="flex flex-col space-y-1 p-2 h-full w-full">
+                <FormSectionComponent loading={loading} onSubmit={onSubmit} reset={reset} control={control} handleSubmit={handleSubmit} setValue={setValue} watch={watch} />
+            </main>
+        );
+    } else {
+        return (
+            <main className="flex flex-col space-y-1 p-2 h-full w-full">
+                <div className="flex flex-row w-full items-center mb-4">
+                    <Button disableRipple isIconOnly onPress={() => router.push("/")} className="bg-transparent">
+                        <IoMdArrowRoundBack className="size-6 text-default-500" />
+                    </Button>
+                    <h1 className="flex flex-row w-full justify-start text-default-500 font-semibold text-xl mb-[2px]">Agregar Soldador</h1>
+                </div>
+                <FormSectionComponentMobile loading={loading} onSubmit={onSubmit} reset={reset} control={control} handleSubmit={handleSubmit} setValue={setValue} watch={watch} />
+            </main>
+        );
     }
-    return (
-        <main className="flex flex-col space-y-1 p-2 h-full w-full">
-            <div className="flex flex-row w-full items-center">
-                <Button isIconOnly onPress={() => router.push("/")} className="bg-transparent">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                    </svg>
-                </Button>
-                <h1 className="flex flex-row w-full justify-center text-default-500 text-xl">Registrar Soldador</h1>
-            </div>
-            <SoldadorFormData formData={formData} setFormData={setFormData} />
-            <section className="flex flex-row w-full justify-end px-4 pt-8 pb-2">
-                <Button isLoading={loading} color="primary" className="uppercase" onPress={onSave} type="submit">
-                    Guardar
-                </Button>
-            </section>
-        </main>
-    );
 }

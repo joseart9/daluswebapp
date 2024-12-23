@@ -1,12 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { getSoldadores } from "@/server/actions/soldador";
 import Soldador from "@/types/Soldador";
 
-export default function useSoldadores() {
+export default function useSoldadores(searchTerm?: string) {
   const [soldadores, setSoldadores] = useState<Soldador[]>([]);
-  const [lastDocId, setLastDocId] = useState<string | null>(null);
+  const [lastDocCursor, setLastDocCursor] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
@@ -14,30 +12,33 @@ export default function useSoldadores() {
     if (loading) return; // Evita cargas múltiples
     setLoading(true);
 
-    console.log("Fetching soldadores...", lastDocId);
+    console.log("Fetching soldadores...", lastDocCursor);
 
-    // Llama a getSoldadores con el lastId recibido (si lo hay)
-    const result = await getSoldadores(lastDocId || undefined);
+    // Pasa searchTerm a getSoldadores
+    const result = await getSoldadores(lastDocCursor, searchTerm);
 
     if (result && result.soldadores.length > 0) {
       const newSoldadores: Soldador[] = result.soldadores;
 
-      // Filtra duplicados basados en idSoldador
       setSoldadores((prevSoldadores) => {
-        const combined = [...prevSoldadores, ...newSoldadores];
-        return combined.filter(
-          (soldador, index, self) =>
-            index ===
-            self.findIndex((s) => s.idSoldador === soldador.idSoldador)
-        );
+        if (lastDocCursor === null) {
+          // Si es la primera carga o se cambió el searchTerm, reemplazamos la lista
+          return newSoldadores;
+        } else {
+          // De lo contrario, concatenamos los nuevos soldadores
+          return [...prevSoldadores, ...newSoldadores];
+        }
       });
 
-      // Actualiza lastDocId para la siguiente página
-      const newLastDocId = result.lastDocId;
-      setLastDocId(newLastDocId || null);
-
-      // Si la cantidad recibida es menor que el límite, no hay más datos
-      setHasMore(newSoldadores.length === 2);
+      // Actualiza lastDocCursor para la siguiente página solo si no hay searchTerm
+      if (!searchTerm) {
+        setLastDocCursor(result.lastDocCursor);
+        // Actualiza hasMore en función de si hay más documentos
+        setHasMore(!!result.lastDocCursor);
+      } else {
+        // Si hay searchTerm, no paginamos
+        setHasMore(false);
+      }
     } else {
       setHasMore(false); // No hay más documentos para cargar
     }
@@ -46,13 +47,15 @@ export default function useSoldadores() {
   };
 
   useEffect(() => {
+    setSoldadores([]); // Resetea la lista de soldadores
+    setLastDocCursor(null); // Resetea el cursor
+    setHasMore(true);
     fetchSoldadores(); // Carga inicial de soldadores
-  }, []);
+  }, [searchTerm]);
 
-  // Resetea el estado si se necesita una nueva búsqueda inicial
   const resetSoldadores = () => {
     setSoldadores([]);
-    setLastDocId(null);
+    setLastDocCursor(null);
     setHasMore(true);
   };
 

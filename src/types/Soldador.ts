@@ -13,4 +13,6 @@ export default interface Soldador {
   direccion?: Direccion;
   empresaActual?: string;
   credenciales?: Credencial;
+  // Virtual field
+  nombreCompleto?: string;
 }

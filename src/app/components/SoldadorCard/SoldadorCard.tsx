@@ -30,7 +30,7 @@ export default function SoldadorCard({ soldador }: { soldador: Soldador }) {
     }
 
     return (
-        <Card isPressable className="w-full shadow-lg" onPress={handleCardClick}>
+        <Card disableRipple isPressable className="w-full shadow-lg" onPress={handleCardClick}>
             <CardHeader className="flex gap-3">
                 <div className="flex flex-col w-full text-left">
                     <p className="text-md">{soldador.primerApellido} {soldador.segundoApellido} {soldador.primerNombre}</p>

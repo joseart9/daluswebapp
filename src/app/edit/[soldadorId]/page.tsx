@@ -1,14 +1,16 @@
 "use client";
-
-import { useEffect, useState, use } from "react";
-import {
-    Button,
-    CircularProgress,
-} from "@nextui-org/react";
-import { useRouter } from 'next/navigation'
-import { getSoldadorById, updateSoldador } from "@/server/actions/soldador";
+import FormSectionComponent from "@/app/components/FormSection/FormSectionComponent";
+import FormSectionComponentMobile from "@/app/components/FormSectionMobile";
 import Soldador from "@/types/Soldador";
-import SoldadorFormData from "@/app/components/SoldadorFormData";
+import { useRouter } from 'next/navigation'
+import { useState, useEffect, use } from "react";
+import { useForm } from "react-hook-form";
+import useScreenSize from "@/hooks/useScreenSize";
+
+import { getSoldadorById, updateSoldador } from "@/server/actions/soldador";
+import alert from "@/utils/Alert";
+import { Button, Spinner } from "@nextui-org/react";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 export default function EditSoldador({
     params,
@@ -16,116 +18,80 @@ export default function EditSoldador({
     params: Promise<{ soldadorId: string }>;
 }) {
     const router = useRouter()
+    const [loading, setLoading] = useState(false);
+    const { control, handleSubmit, watch, setValue, reset } = useForm<Soldador>({});
     const { soldadorId: soldadorId } = use(params);
-    const [loading, setLoading] = useState(true);
-    const [loadingUpdate, setLoadingUpdate] = useState(false);
-    const [formData, setFormData] = useState<Soldador>(
-        {
-            idSoldador: "",
-            primerNombre: "",
-            segundoNombre: "",
-            primerApellido: "",
-            segundoApellido: "",
-            correo: "",
-            empresaActual: "",
-            telefono: {
-                lada: "",
-                numero: "",
-            },
-            direccion: {
-                calle: "",
-                numeroExterior: "",
-                colonia: "",
-                codigoPostal: "",
-            },
-            credenciales: {
-                aws: {
-                    idSoldador: "",
-                    certificaciones: [],
-                    fechaVencimiento: undefined,
-                    historialPago: {
-                        archivoFactura: "",
-                        fechaPago: undefined,
-                        empleado: "",
-                    },
-                    active: false,
-                },
-                ipc: {
-                    certificaciones: [],
-                    fechaVencimiento: undefined,
-                    historialPago: {
-                        archivoFactura: "",
-                        fechaPago: undefined,
-                        empleado: "",
-                    },
-                    active: false,
-                },
-                custom: {
-                    certificaciones: [],
-                    fechaVencimiento: undefined,
-                    active: false,
-                }
-            }
-        }
-    );
+    const [loadingData, setLoadingData] = useState(true);
+    const screenSize = useScreenSize();
 
     useEffect(() => {
-        setLoading(true)
-        async function fetchSoldador() {
-            const res = await getSoldadorById(soldadorId)
-            if (res) {
-                setFormData(res);
-            } else {
-                setLoading(false);
+        const fetchData = async () => {
+            const data = await getSoldadorById(soldadorId);
+            if (data) {
+                reset(data);
+                setLoadingData(false);
             }
-            setLoading(false)
-        }
-        fetchSoldador()
-    }, [])
+        };
+        fetchData();
+    }, []);
 
-    const handleUpdateSoldador = async () => {
-        setLoadingUpdate(true)
+    const onSubmit = async (data: any) => {
+        setLoading(true);
         try {
-            await updateSoldador(formData)
-            setLoadingUpdate(false)
-            router.push("/")
+            await updateSoldador(data);
+            alert("Soldador actualizado correctamente", "success");
+            router.push("/");
         } catch (error) {
-            console.error(error)
-            setLoadingUpdate(false)
+            console.error("Error al actualizar el soldador:", error);
+            alert("Error al actualizar el soldador, contacte con un administrador", "error");
+        } finally {
+            setLoading(false);
         }
     }
 
-    if (!formData) return (
-        <main className="flex h-screen w-screen items-center justify-center">
-            <CircularProgress color="primary" />
-        </main>
-    );
-
-
-
-    if (loading) return (
-        <main className="flex h-screen w-screen items-center justify-center">
-            <CircularProgress color="primary" />
-        </main>
-    );
-
-
-    return (
-        <div className="flex w-full flex-col">
-            <div className="flex flex-row w-full items-center">
-                <Button isIconOnly onPress={() => router.push("/")} className="bg-transparent">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                    </svg>
-                </Button>
-                <h1 className="flex flex-row w-full justify-center text-default-500 text-xl">Editar Soldador</h1>
+    if (loadingData) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen">
+                <div className="flex flex-col items-center gap-4">
+                    <h1 className="text-2xl font-semibold text-primary/50">Cargando información...</h1>
+                    <div className="flex gap-2">
+                        <Spinner color="primary" />
+                    </div>
+                </div>
             </div>
-            {formData && <SoldadorFormData formData={formData} setFormData={setFormData} />}
-            <section className="flex flex-row w-full justify-end px-4 pt-4 pb-4">
-                <Button isLoading={loadingUpdate} color="primary" className="uppercase" onPress={handleUpdateSoldador} type="submit">
-                    Guardar
-                </Button>
-            </section>
-        </div>
-    )
+        )
+    }
+
+
+    if (screenSize === "desktop") {
+        return (
+            <>
+                <div>
+                    <div className="flex flex-row w-full items-center mb-4">
+                        <Button disableRipple isIconOnly onPress={() => router.push("/")} className="bg-transparent">
+                            <IoMdArrowRoundBack className="size-6 text-default-500" />
+                        </Button>
+                        <h1 className="flex flex-row w-full justify-start text-default-500 font-semibold text-xl mb-[2px]">Editar Soldador</h1>
+                    </div>
+                    <FormSectionComponent loading={loading} onSubmit={onSubmit} control={control} watch={watch} handleSubmit={handleSubmit} setValue={setValue} />
+                </div>
+            </>
+        )
+    }
+
+    if (screenSize === "mobile" || screenSize === "tablet") {
+        return (
+            <>
+                <div>
+                    <div className="flex flex-row w-full items-center mb-4">
+                        <Button disableRipple isIconOnly onPress={() => router.push("/")} className="bg-transparent">
+                            <IoMdArrowRoundBack className="size-6 text-default-500" />
+                        </Button>
+                        <h1 className="flex flex-row w-full justify-start text-default-500 font-semibold text-xl mb-[2px]">Editar Soldador</h1>
+                    </div>
+                    <FormSectionComponentMobile loading={loading} onSubmit={onSubmit} control={control} watch={watch} handleSubmit={handleSubmit} setValue={setValue} />
+                </div>
+            </>
+        )
+    }
 }

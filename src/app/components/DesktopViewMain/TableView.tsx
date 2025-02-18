@@ -194,43 +194,49 @@ export default function DesktopViewTable() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
             } />
-            <Table
-                aria-label="Tabla de Soldadores"
-                color="primary"
-                isStriped
-                classNames={{
-                    tr: "even:bg-primary/5",
-                    base: "max-h-[520px] overflow-auto",
-                }}
-                baseRef={scrollerRef}
-                bottomContent={
-                    hasMore ? (
-                        <div className="flex justify-center">
-                            <Spinner ref={loaderRef} color="primary" />
-                        </div>
-                    ) : null
-                }
-                className="h-full px-2"
-            >
-                <TableHeader columns={columns}>
-                    {(column) => (
-                        <TableColumn key={column.uid} align="start">
-                            {column.name}
-                        </TableColumn>
-                    )}
-                </TableHeader>
-                <TableBody
-                    items={soldadores}
+            {loading && soldadores.length === 0 ? (
+                <div className="flex justify-center items-center h-screen">
+                    <Spinner color="primary" />
+                </div>
+            ) : (
+                <Table
+                    aria-label="Tabla de Soldadores"
+                    color="primary"
+                    isStriped
+                    classNames={{
+                        tr: "even:bg-primary/5",
+                        base: "max-h-[520px] overflow-auto",
+                    }}
+                    baseRef={scrollerRef}
+                    bottomContent={
+                        hasMore ? (
+                            <div className="flex justify-center">
+                                <Spinner ref={loaderRef} color="primary" />
+                            </div>
+                        ) : null
+                    }
+                    className="h-full px-2"
                 >
-                    {(soldador) => (
-                        <TableRow key={soldador.idSoldador} className="cursor-pointer hover:bg-primary/20" onClick={() => handleEdit(soldador)}>
-                            {(columnKey) => (
-                                <TableCell>{renderCell(soldador, columnKey)}</TableCell>
-                            )}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                    <TableHeader columns={columns}>
+                        {(column) => (
+                            <TableColumn key={column.uid} align="start">
+                                {column.name}
+                            </TableColumn>
+                        )}
+                    </TableHeader>
+                    <TableBody
+                        items={soldadores}
+                    >
+                        {(soldador) => (
+                            <TableRow key={soldador.idSoldador} className="cursor-pointer hover:bg-primary/20" onClick={() => handleEdit(soldador)}>
+                                {(columnKey) => (
+                                    <TableCell>{renderCell(soldador, columnKey)}</TableCell>
+                                )}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            )}
         </div>
     );
 }
